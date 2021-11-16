@@ -21,6 +21,7 @@ public class AuctionServer
 	{
 		try
 		{
+			System.out.println("Started Auctioning Server");
 			serverSocket = new ServerSocket(PORT);
 		}
 		catch (IOException ioEx)
@@ -32,7 +33,6 @@ public class AuctionServer
 		do
 		{
 			//Wait for client...
-			System.out.println("Auction System started, waiting for new connections");
 			Socket client = serverSocket.accept();
 
 			System.out.println("\nNew client accepted.\n");
@@ -77,24 +77,43 @@ class ClientHandler extends Thread
 	
 	public void run()
 	{
-		String received;
-		String welcomeMsg = "Successfully connected to auctioning system\n" + 
-		"-------------------------------------\n" + 
-		"Current item for sale is Bicycle at The price 50 euros\n" + 
-		" * Enter 1 to place a bid on the item\n" + 
-		" * Enter 5 to quit\n";
-		// do
-		// {
-			//Accept message from client on
-			//the socket's input stream...
-			// received = input.nextLine();
+		String highestBid = "50";
 
-			//Echo message back to client on
-			//the socket's output stream...
-			output.println(welcomeMsg);
+		String welcomeMsg = String.format("------------------------------------------------------\n" +
+							"Successfully connected to auctioning system\n" + 
+							"------------------------------------------------------\n" + 
+							"Current item for sale is Bicycle at The price %s euros\n" + 
+							" * Enter 1 to place a bid on the item\n" + 
+							" * Enter 5 to quit\n", highestBid);
 
-		//Repeat above until 'QUIT' sent by client...
-		// }while (!received.equals("QUIT"));
+		output.println(welcomeMsg);
+
+		String userChoice = input.nextLine();
+
+
+		if( Objects.equals(userChoice, "1") ) { 
+
+			output.println("Enter your bid amount");
+			highestBid = input.nextLine();
+			
+			//validate bid
+			// if() { 
+
+			// }
+
+			//print new bid to all users connected
+			output.println("The bid for bicycle is now " + highestBid);
+
+		} else if ( Objects.equals(userChoice, "5") ) { 
+			output.println("Closing connection..");
+		} else { 
+			output.println("Unrecognized command");
+		}
+
+
+	
+
+
 
 		try
 		{

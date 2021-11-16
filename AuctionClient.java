@@ -50,14 +50,31 @@ public class AuctionClient
 			//Set up stream for keyboard entry...
 			Scanner userEntry = new Scanner(System.in);
 
-			String message, response;
+			String serverMsg, choice;
 
-			
+			//read multiple lines from the server -> connection startup message
 			while(networkInput.hasNextLine()) { 
-				response = networkInput.nextLine();
-				System.out.print("\n" + response);
+				serverMsg = networkInput.nextLine();
+				System.out.print("\n" + serverMsg);
+
+				if(serverMsg.isEmpty()) { 
+					break;
+				}
 			}
 
+
+			//enter the choice and send to server
+			choice = userEntry.nextLine();
+			networkOutput.println(choice);
+
+			//server asking for bid amount
+			System.out.println(networkInput.nextLine());
+			networkOutput.println("60");
+
+			//get the highest bid msg
+			System.out.println(networkInput.nextLine());
+
+			//close scanner
 			userEntry.close();
 		}
 		catch(IOException ioEx)
