@@ -54,8 +54,8 @@ public class AuctionServer
 class ClientHandler extends Thread
 {
 	private Socket client;
-	private Scanner input;
-	private PrintWriter output;
+	private DataInputStream input;
+	private DataOutputStream output;
 
 	public ClientHandler(Socket socket)
 	{
@@ -64,9 +64,8 @@ class ClientHandler extends Thread
 
 		try
 		{
-			input = new Scanner(client.getInputStream());
-			output = new PrintWriter(
-							client.getOutputStream(),true);
+			input = new DataInputStream( socket.getInputStream());
+			output = new DataOutputStream( socket.getOutputStream());
 		}
 		catch(IOException ioEx)
 		{
@@ -76,35 +75,36 @@ class ClientHandler extends Thread
 
 	
 	public void run()
-	{
-		String highestBid = "50";
-
-		// String welcomeMsg = String.format("------------------------------------------------------\n" +
-		// 					"Successfully connected to auctioning system\n" + 
-		// 					"------------------------------------------------------\n" + 
-		// 					"Current item for sale is Bicycle at The price %s euros\n" + 
-		// 					" * Enter 1 to place a bid on the item\n" + 
-		// 					" * Enter 5 to quit\n", highestBid);
-
-		
-
+	{	
 		AuctionServerProtocol protocol = new AuctionServerProtocol();
 
-		// String userChoice = input.nextLine();
 		String clientInput;
 		String outputLine;
 
 		outputLine = protocol.processInput(null);
-        output.println(outputLine);
+        try {
+			output.writeUTF(outputLine);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 
-		while ( ( clientInput = input.nextLine()) != null ) {
-			outputLine = protocol.processInput(clientInput);
-			output.println(outputLine);
-			
-			if (outputLine.equals("QUIT") ) {
-				break;
-			}
+		try {
+			while ( ( clientInput = input.readUTF()) != null ) {
+				outputLine = protocol.processInput(clientInput);
+				try {
+					output.writeUTF(outputLine);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 				
+				if (outputLine.equals("QUIT") ) {
+					break;
+				}
+					
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 

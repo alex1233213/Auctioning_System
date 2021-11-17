@@ -3,14 +3,19 @@ public class AuctionServerProtocol {
     private static final int INITIAL = 0;
     private static final int RECEIVE_CHOICE = 1;
     private static final int RECEIVE_BID = 2;
-    // private static final 
+    private static final int DEFAULT = 3;
     private static int state = INITIAL;
+
+    private static String defaltMsg;
     
     // private static final int ;
     // private static final int;
 
     public AuctionServerProtocol() { 
         bidItem = new BidItem("Bicycle", 50, 60);
+        defaltMsg = String.format("Current item for sale is %s - price is %.2f euros\n" + 
+                                    " * Enter 1 to place a bid on the item\n" + 
+                                    " * Enter 5 to quit\n", bidItem.getName(), bidItem.getPrice());
     }
 
 
@@ -35,16 +40,14 @@ public class AuctionServerProtocol {
             output = "------------------------------------------------------\n" +
                      "Successfully connected to auctioning system\n" + 
                      "------------------------------------------------------\n" + 
-                     "Current item for sale is Bicycle at The price %s euros\n" + 
-                     " * Enter 1 to place a bid on the item\n" + 
-                     " * Enter 5 to quit\n";
+                      defaltMsg;
             
             state = RECEIVE_CHOICE;
 
         //check on the choice entered by the user
         } else if ( state == RECEIVE_CHOICE) {
 
-            if (input.equalsIgnoreCase("1")) {
+            if (input.equals("1")) {
 
                 output = "Enter new bid for the item";
                 state = RECEIVE_BID;
@@ -57,34 +60,41 @@ public class AuctionServerProtocol {
 
                 output = "Invalid choice\n" + "* Enter 1 to place a bid on the item\n" + 
                             "* Enter 5 to quit\n";
-                state = RECEIVE_CHOICE;
 
             }
 
             
-        } 
+        } else if(state == RECEIVE_BID) { 
+
+            //value expected is the bid value
+
+            try { 
+                float bidEntered = Float.parseFloat(input);
+                float currentPrice = bidItem.getPrice();
+
+                if(bidEntered > currentPrice) { 
+                    bidItem.setPrice(bidEntered);
+                    output = String.format("Bid updated. New selling price is %f", bidItem.getPrice());
+
+                    state = DEFAULT;
+                    //TODO send to all clients the new price of the item
+
+                } else {
+                    output = "The value of the bid must be greater than the current bid. Try again.\n" + 
+                                "Enter bid amount:\n";
+                }
+
+            } catch (Exception e) { 
+                output = "Invalid input, try again";
+            }
         
-        // else if(state == RECEIVE_BID) { 
+        } else if(state == DEFAULT) { 
+            output = defaltMsg;
 
-        //     //value expected is the new auction
-            
-        //     // //check new bid value entered by the user
-        //     // if( bidItem.getPrice() ) {
-        //     //     ;
-        //     // }
-        //     // float valueSent = input.
-        //     // if (input.equalsIgnoreCase("1")) {
-        //     //     output = "Enter new bid for the item";
-        //     //     state = RECEIVE_BID;
-        //     // } else if(input.equalsIgnoreCase("QUIT")) {
-        //     //     output = "Connection has been terminated";
-        //     // }
-
-        //     state = BID_RECEIVED;
-        // }
-        // } else if(state == RECEIVE_CHOICE) { 
-        //     output = "";
-        // } 
+            state = RECEIVE_CHOICE;
+        }
+        
+        
         
         return output;
     }

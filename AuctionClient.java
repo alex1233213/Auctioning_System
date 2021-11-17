@@ -39,13 +39,13 @@ public class AuctionClient
 			socket = new Socket(host,PORT);
 
 			//for reading from the server
-			Scanner networkInput =
-						new Scanner(socket.getInputStream());
+			DataInputStream networkInput =
+						new DataInputStream(socket.getInputStream());
 
 			//for writing to the server
-			PrintWriter networkOutput =
-					new PrintWriter(
-							socket.getOutputStream(),true);
+			DataOutputStream networkOutput =
+					new DataOutputStream(
+							socket.getOutputStream());
 
 			//Set up stream for keyboard entry...
 			Scanner userEntry = new Scanner(System.in);
@@ -55,31 +55,20 @@ public class AuctionClient
 			
 
 			//continue communication with server until "QUIT" message received
-			while ( (msgFromServer = networkInput.nextLine() ) != null ) {
+			while ( (msgFromServer = networkInput.readUTF() ) != null ) {
                
-				System.out.println("Server>: " + networkInput.nextLine());
-				if( networkInput.hasNextLine() ) {
-					while(networkInput.hasNextLine() ) { 
-						msgFromServer = networkInput.nextLine();
-						System.out.println("Server>: " + msgFromServer);
-						if( msgFromServer.isEmpty() ) { 
-							break;
-						} 
-					}
-				}
-				
+				System.out.println(msgFromServer);
 
                 if (msgFromServer.equalsIgnoreCase("QUIT")) {
 					break;
 				}
                     
+				System.out.print("\n>>");
                 msgToServer = userEntry.nextLine();
                 if (msgToServer != null) {
-                    System.out.println("Client: " + msgToServer);
-                    networkOutput.println(msgToServer);
+                    networkOutput.writeUTF(msgToServer);
                 }
 
-				msgFromServer = "";
             }
 
 
