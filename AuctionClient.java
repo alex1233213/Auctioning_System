@@ -72,30 +72,6 @@ public class AuctionClient
             }
 
 
-			//*****prvious code ***/
-
-			//read multiple lines from the server -> connection startup message
-			// while(networkInput.hasNextLine()) { 
-			// 	msgmsgFromServer = networkInput.nextLine();
-			// 	System.out.print("\n>MSG FROM SERVER:" + msgmsgFromServer);
-
-			// 	if(msgmsgFromServer.isEmpty()) { 
-			// 		break;
-			// 	}
-			// }
-
-
-			// //enter the choice and send to server
-			// choice = userEntry.nextLine();
-			// networkOutput.println(choice);
-
-			// //server asking for bid amount
-			// System.out.println(networkInput.nextLine());
-			// networkOutput.println("60");
-
-			// //get the highest bid msg
-			// System.out.println(networkInput.nextLine());
-
 			//close scanner
 			userEntry.close();
 		}

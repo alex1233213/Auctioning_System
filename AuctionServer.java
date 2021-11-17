@@ -7,18 +7,21 @@
 
 import java.io.*;
 import java.net.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
 
 
 public class AuctionServer
 {
 	private static ServerSocket serverSocket;
 	private static final int PORT = 1234;
-	
-
+	private static List<ClientHandler> clientList = new ArrayList<>();
 
 	public static void main(String[] args) throws IOException
 	{
+		AuctionServer auctionServer = new AuctionServer();
+
 		try
 		{
 			System.out.println("Started Auctioning Server");
@@ -41,13 +44,20 @@ public class AuctionServer
 			//this client and pass the constructor for this
 			//thread a reference to the relevant socket...
 			ClientHandler clientHandler = new ClientHandler(client);
+			clientHandler.setAuctionServer(auctionServer);
 
+			clientList.add(clientHandler);
 			clientHandler.start();//As usual, this method calls run.
 		}while (true);
 	}
 
 
-	
+	public void sendToAll(String message) throws IOException{
+        for(ClientHandler client : clientList) {
+            client.getOutput().writeUTF(message);
+		}
+    }
+
 }
 
 
@@ -56,9 +66,53 @@ class ClientHandler extends Thread
 	private Socket client;
 	private DataInputStream input;
 	private DataOutputStream output;
+	private AuctionServer auctionServer;
+
+
+	public AuctionServer getAuctionServer() {
+		return auctionServer;
+	}
+
+
+	public void setAuctionServer(AuctionServer auctionServer) {
+		this.auctionServer = auctionServer;
+	}
+
+
+	public Socket getClient() {
+		return client;
+	}
+
+
+	public void setClient(Socket client) {
+		this.client = client;
+	}
+
+
+	public DataInputStream getInput() {
+		return input;
+	}
+
+
+	public void setInput(DataInputStream input) {
+		this.input = input;
+	}
+
+
+	public DataOutputStream getOutput() {
+		return output;
+	}
+
+
+	public void setOutput(DataOutputStream output) {
+		this.output = output;
+	}
+
+
 
 	public ClientHandler(Socket socket)
 	{
+
 		//Set up reference to associated socket...
 		client = socket;
 
@@ -76,7 +130,7 @@ class ClientHandler extends Thread
 	
 	public void run()
 	{	
-		AuctionServerProtocol protocol = new AuctionServerProtocol();
+		AuctionServerProtocol protocol = new AuctionServerProtocol(auctionServer);
 
 		String clientInput;
 		String outputLine;
@@ -91,6 +145,7 @@ class ClientHandler extends Thread
 		try {
 			while ( ( clientInput = input.readUTF()) != null ) {
 				outputLine = protocol.processInput(clientInput);
+
 				try {
 					output.writeUTF(outputLine);
 				} catch (IOException e) {
@@ -103,34 +158,8 @@ class ClientHandler extends Thread
 					
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-
-		//****working  */
-		// if( Objects.equals(userChoice, "1") ) { 
-
-		// 	output.println("Enter your bid amount");
-		// 	highestBid = input.nextLine();
-			
-		// 	//validate bid
-		// 	// if() { 
-
-		// 	// }
-
-		// 	//print new bid to all users connected
-		// 	output.println("The bid for bicycle is now " + highestBid);
-
-		// } else if ( Objects.equals(userChoice, "5") ) { 
-		// 	output.println("Closing connection..");
-		// } else { 
-		// 	output.println("Unrecognized command");
-		// }
-
-
-	
-
 
 
 		try
