@@ -52,7 +52,6 @@ public class AuctionClient
 
 			String msgFromServer = "", msgToServer;
 
-			
 
 			//continue communication with server until "QUIT" message received
 			while ( (msgFromServer = networkInput.readUTF() ) != null ) {

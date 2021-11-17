@@ -80,7 +80,7 @@ public class AuctionServerProtocol {
                 if(bidEntered > currentPrice) { 
                     bidItem.setPrice(bidEntered);
                     output = String.format("Bid updated. New selling price is %.2f", bidItem.getPrice());
-                    auctionServer.sendToAll(output);
+                    AuctionServer.sendToAll(output);
 
                     state = DEFAULT;
                     //TODO send to all clients the new price of the item

@@ -2,12 +2,24 @@ public class BidItem {
     private String name;
     private float price;
     private int bidPeriod; //seconds;
+    private boolean sold;
 
 
     public BidItem(String name, float price, int bidPeriod) {
         this.name = name;
         this.price = price;
         this.bidPeriod = bidPeriod;
+        this.sold = false;
+    }
+
+
+    public boolean isSold() {
+        return sold;
+    }
+
+
+    public void setSold(boolean sold) {
+        this.sold = sold;
     }
 
 
