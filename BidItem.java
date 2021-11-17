@@ -1,13 +1,10 @@
 public class BidItem {
     private String name;
-    
+    private float price;
+    private int bidPeriod; //seconds;
 
 
-    private String price;
-    private String bidPeriod;
-
-
-    public BidItem(String name, String price, String bidPeriod) {
+    public BidItem(String name, float price, int bidPeriod) {
         this.name = name;
         this.price = price;
         this.bidPeriod = bidPeriod;
@@ -24,22 +21,22 @@ public class BidItem {
     }
 
 
-    public String getPrice() {
+    public float getPrice() {
         return price;
     }
 
 
-    public void setPrice(String price) {
+    public void setPrice(float price) {
         this.price = price;
     }
 
 
-    public String getBidPeriod() {
+    public int getBidPeriod() {
         return bidPeriod;
     }
 
 
-    public void setBidPeriod(String bidPeriod) {
+    public void setBidPeriod(int bidPeriod) {
         this.bidPeriod = bidPeriod;
     }
 }

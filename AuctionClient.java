@@ -50,29 +50,62 @@ public class AuctionClient
 			//Set up stream for keyboard entry...
 			Scanner userEntry = new Scanner(System.in);
 
-			String serverMsg, choice;
+			String msgFromServer = "", msgToServer;
 
-			//read multiple lines from the server -> connection startup message
-			while(networkInput.hasNextLine()) { 
-				serverMsg = networkInput.nextLine();
-				System.out.print("\n" + serverMsg);
+			
 
-				if(serverMsg.isEmpty()) { 
+			//continue communication with server until "QUIT" message received
+			while ( (msgFromServer = networkInput.nextLine() ) != null ) {
+               
+				System.out.println("Server>: " + networkInput.nextLine());
+				if( networkInput.hasNextLine() ) {
+					while(networkInput.hasNextLine() ) { 
+						msgFromServer = networkInput.nextLine();
+						System.out.println("Server>: " + msgFromServer);
+						if( msgFromServer.isEmpty() ) { 
+							break;
+						} 
+					}
+				}
+				
+
+                if (msgFromServer.equalsIgnoreCase("QUIT")) {
 					break;
 				}
-			}
+                    
+                msgToServer = userEntry.nextLine();
+                if (msgToServer != null) {
+                    System.out.println("Client: " + msgToServer);
+                    networkOutput.println(msgToServer);
+                }
+
+				msgFromServer = "";
+            }
 
 
-			//enter the choice and send to server
-			choice = userEntry.nextLine();
-			networkOutput.println(choice);
+			//*****prvious code ***/
 
-			//server asking for bid amount
-			System.out.println(networkInput.nextLine());
-			networkOutput.println("60");
+			//read multiple lines from the server -> connection startup message
+			// while(networkInput.hasNextLine()) { 
+			// 	msgmsgFromServer = networkInput.nextLine();
+			// 	System.out.print("\n>MSG FROM SERVER:" + msgmsgFromServer);
 
-			//get the highest bid msg
-			System.out.println(networkInput.nextLine());
+			// 	if(msgmsgFromServer.isEmpty()) { 
+			// 		break;
+			// 	}
+			// }
+
+
+			// //enter the choice and send to server
+			// choice = userEntry.nextLine();
+			// networkOutput.println(choice);
+
+			// //server asking for bid amount
+			// System.out.println(networkInput.nextLine());
+			// networkOutput.println("60");
+
+			// //get the highest bid msg
+			// System.out.println(networkInput.nextLine());
 
 			//close scanner
 			userEntry.close();

@@ -79,36 +79,54 @@ class ClientHandler extends Thread
 	{
 		String highestBid = "50";
 
-		String welcomeMsg = String.format("------------------------------------------------------\n" +
-							"Successfully connected to auctioning system\n" + 
-							"------------------------------------------------------\n" + 
-							"Current item for sale is Bicycle at The price %s euros\n" + 
-							" * Enter 1 to place a bid on the item\n" + 
-							" * Enter 5 to quit\n", highestBid);
+		// String welcomeMsg = String.format("------------------------------------------------------\n" +
+		// 					"Successfully connected to auctioning system\n" + 
+		// 					"------------------------------------------------------\n" + 
+		// 					"Current item for sale is Bicycle at The price %s euros\n" + 
+		// 					" * Enter 1 to place a bid on the item\n" + 
+		// 					" * Enter 5 to quit\n", highestBid);
 
-		output.println(welcomeMsg);
+		
 
-		String userChoice = input.nextLine();
+		AuctionServerProtocol protocol = new AuctionServerProtocol();
 
+		// String userChoice = input.nextLine();
+		String clientInput;
+		String outputLine;
 
-		if( Objects.equals(userChoice, "1") ) { 
+		outputLine = protocol.processInput(null);
+        output.println(outputLine);
 
-			output.println("Enter your bid amount");
-			highestBid = input.nextLine();
+		while ( ( clientInput = input.nextLine()) != null ) {
+			outputLine = protocol.processInput(clientInput);
+			output.println(outputLine);
 			
-			//validate bid
-			// if() { 
-
-			// }
-
-			//print new bid to all users connected
-			output.println("The bid for bicycle is now " + highestBid);
-
-		} else if ( Objects.equals(userChoice, "5") ) { 
-			output.println("Closing connection..");
-		} else { 
-			output.println("Unrecognized command");
+			if (outputLine.equals("QUIT") ) {
+				break;
+			}
+				
 		}
+
+
+		//****working  */
+		// if( Objects.equals(userChoice, "1") ) { 
+
+		// 	output.println("Enter your bid amount");
+		// 	highestBid = input.nextLine();
+			
+		// 	//validate bid
+		// 	// if() { 
+
+		// 	// }
+
+		// 	//print new bid to all users connected
+		// 	output.println("The bid for bicycle is now " + highestBid);
+
+		// } else if ( Objects.equals(userChoice, "5") ) { 
+		// 	output.println("Closing connection..");
+		// } else { 
+		// 	output.println("Unrecognized command");
+		// }
 
 
 	
