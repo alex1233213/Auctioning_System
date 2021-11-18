@@ -20,14 +20,6 @@ public class AuctionServerProtocol {
 
 
 
-    // public static BidItem getBidItem() {
-    //     return bidItem;
-    // }
-
-
-    public static void setBidItem(BidItem bidItem) {
-        AuctionServerProtocol.bidItem = bidItem;
-    }
 
     
     //Method to determine the state of communication between client and server
@@ -66,32 +58,25 @@ public class AuctionServerProtocol {
 
             
         } else if(state == RECEIVE_BID) { 
-
+            
             //value expected is the bid value
-
             try { 
                 float bidEntered = Float.parseFloat(input);
-                float currentPrice = bidItem.getPrice();
+                output = AuctionSystem.updateBidPrice(bidEntered);
 
-                if(bidEntered > currentPrice) { 
-
-                    bidItem.setPrice(bidEntered);
-                    bidItem = AuctionSystem.getCurrentBidItem();
-                    
-                    output = String.format("Bid updated. New selling price is %.2f", bidItem.getPrice());
-                    AuctionServer.sendToAll(output);
-                    
-
-                    state = DEFAULT;
-
-                } else {
+                if(output == null) { 
                     output = String.format("The value of the bid must be greater than current bid - %.2f euro. Try again.\n" + 
-                                "Enter bid amount:\n", bidItem.getPrice());
+                                            "Enter bid amount:\n", bidItem.getPrice());
+                } else { 
+                    output = output + "\n\n" + getDefaultMessage();
+                    state = RECEIVE_CHOICE;
                 }
-
-            } catch (Exception e) { 
-                output = "Invalid input, try again";
-            }
+                
+                
+            }   catch (Exception e) { 
+                    output = "Invalid input, try again\nEnter new price greater than "
+                                 + bidItem.getPrice();
+            }           
         
         } else if(state == DEFAULT) { 
             defaltMsg = getDefaultMessage();
@@ -111,6 +96,7 @@ public class AuctionServerProtocol {
     public String getDefaultMessage() { 
         return String.format("Current item for sale is %s - price is %.2f euros\n" + 
                 " * Enter 1 to place a bid on the item\n" + 
-                " * Enter 5 to quit\n", AuctionSystem.getCurrentBidItem().getName(), AuctionSystem.getCurrentBidItem().getPrice());
+                " * Enter 5 to quit\n", AuctionSystem.getCurrentBidItem().getName()
+                , AuctionSystem.getCurrentBidItem().getPrice());
     }
 }

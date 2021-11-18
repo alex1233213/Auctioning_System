@@ -10,7 +10,7 @@ public class AuctionSystem {
 
 
     public AuctionSystem() { 
-        bidItems.add(new BidItem("Bicycle", 100f, 3));
+        bidItems.add(new BidItem("Bicycle", 100f, 30));
 		bidItems.add(new BidItem("Keyboard", 10f, 60));
 		bidItems.add(new BidItem("Mouse", 7.5f, 60));
 		bidItems.add(new BidItem("Monitor", 120f, 60));
@@ -60,17 +60,8 @@ public class AuctionSystem {
 					//and get the next product
 					if( currentBidItem.getPrice() != originalPrice ) { 
 						currentBidItem.setSold(true);
-						// try {
-							// sendToAll(String.format("%s has been sold for %.2f euro",
-							// 						 currentBidItem.getName(),
-							// 						 currentBidItem.getPrice()) );
-
-                        // }
-						// } catch (IOException e) {
-						// 	e.printStackTrace();
-						// }
 						
-						//get the next item in the product list, if there is any
+                        //get the next item to sell
 						if( getNextBidItem() != null ) { 
 							currentBidItem = getNextBidItem();
 							seconds = currentBidItem.getBidPeriod();
@@ -82,4 +73,24 @@ public class AuctionSystem {
 			}
 		}, 0, 1000);
 	}
+
+
+    //method returns string if bid price is updated successfully 
+    //or returns null if an error occurred when updating the bid price
+    static String updateBidPrice(float price) { 
+       
+
+        if(price > currentBidItem.getPrice()) { 
+            currentBidItem.setPrice(price);
+
+            return String.format("Bid updated. New selling price is %.2f", currentBidItem.getPrice());
+            
+			//TODO NOTIFY CLIENTS
+        }         
+
+        return null;
+    }
+
+
+
 }
