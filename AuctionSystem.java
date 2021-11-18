@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -12,7 +13,7 @@ public class AuctionSystem {
     public AuctionSystem() { 
         bidItems.add(new BidItem("Bicycle", 100f, 5));
 		bidItems.add(new BidItem("Keyboard", 10f, 5));
-		bidItems.add(new BidItem("Mouse", 7.5f, bidPeriod));
+		bidItems.add(new BidItem("Mouse", 7.5f, 5));
 		bidItems.add(new BidItem("Monitor", 120f, bidPeriod));
 		bidItems.add(new BidItem("HDMI cable", 5.5f, bidPeriod));
 
@@ -44,8 +45,6 @@ public class AuctionSystem {
     static void countDownBidPeriod() { 
 		timer = new Timer();
 
-		float originalPrice = currentBidItem.getPrice();
-
 		timer.scheduleAtFixedRate(new TimerTask() {
 			int seconds = currentBidItem.getBidPeriod();
 
@@ -57,9 +56,19 @@ public class AuctionSystem {
 					
 					//if the price is different than initial price means then mark product as sold 
 					//and get the next product
-					if( currentBidItem.getPrice() != originalPrice ) { 
-						currentBidItem.setSold(true);
+					if( currentBidItem.getPrice() != currentBidItem.getListingPrice() ) { 
 						
+						currentBidItem.setSold(true);
+						String bidEndNotification = "Item "
+												 + currentBidItem.getName() 
+												 + " has been sold to " + currentBidItem.getHighestBidder();
+						try {
+							AuctionServer.sendToAll(bidEndNotification);
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+
                         //get the next item to sell
 						if( getNextBidItem() != null ) { 
 							currentBidItem = getNextBidItem();
@@ -67,8 +76,14 @@ public class AuctionSystem {
 						} else {
 
 							currentBidItem = null;
-							// timer.cancel();
-							//TODO ******NOTIFY CLIENTS ALL ITEMS SOLD */
+							timer.cancel();
+
+							try {
+								AuctionServer.sendToAll("All items have been sold");
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 
 						}
 					} else { //when price is the same, reset the timer to original product's bid period
@@ -87,12 +102,14 @@ public class AuctionSystem {
 
         if(price > currentBidItem.getPrice()) { 
             currentBidItem.setPrice(price);
+			currentBidItem.setHighestBidder("user");
 
 			//restart timer
 			timer.cancel();
 			countDownBidPeriod();
 
-            return String.format("Bid updated. New selling price is %.2f", currentBidItem.getPrice());
+            return String.format("Bid for %s updated. New selling price is %.2f.\nBid expires in %d seconds.\n",
+								 currentBidItem.getName(), currentBidItem.getPrice(), currentBidItem.getBidPeriod());
             
 			//TODO NOTIFY CLIENTS
         }         

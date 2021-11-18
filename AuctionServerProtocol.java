@@ -63,12 +63,13 @@ public class AuctionServerProtocol {
             try { 
                 float bidEntered = Float.parseFloat(input);
                 output = AuctionSystem.updateBidPrice(bidEntered);
-
+                
                 if(output == null) { 
                     output = String.format("The value of the bid must be greater than current bid - %.2f euro. Try again.\n" + 
                                             "Enter bid amount:\n", bidItem.getPrice());
                 } else { 
                     output = output + "\n\n" + getDefaultMessage();
+                    AuctionServer.sendToAll(output);
                     state = RECEIVE_CHOICE;
                 }
                 
