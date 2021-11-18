@@ -119,7 +119,7 @@ public class AuctionClient
 			System.exit(-1);
 		} else { 
 			clientName = args[0];
-			System.out.println(clientName);
+			System.out.println("Connecting to server with name " + clientName);
 		}
 
 		try

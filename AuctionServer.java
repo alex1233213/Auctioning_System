@@ -26,6 +26,25 @@ public class AuctionServer
     }
 
 
+	/*
+		When an item is sold, users will be sent notification informing about 
+		bidding for the new item listed. The state of the protocol for all clients
+		is changed to respond to the notification sent. 
+	*/
+	public static void resetStateForAllClients() throws IOException {
+		String notification = String.format("\n\nCurrent item for sale is " +
+						 AuctionSystem.getCurrentBidItem().getName() + 
+						 " - price is %.2f euro" +
+						  "\n * Enter 1 to place a bid on the item\n" + 
+						 " * Enter 2 to quit.", AuctionSystem.getCurrentBidItem().getPrice());
+		sendToAll(notification);
+		
+		for(ClientHandler client : clientList) {
+            client.protocol.changeStateToReceive();
+		}
+	}
+
+
 	//will return true if the client is already registered to the system
 	public static boolean clientExists(String clientName) {
 		
@@ -79,6 +98,7 @@ public class AuctionServer
 
 class ClientHandler extends Thread
 {
+	AuctionServerProtocol protocol;
 	private Socket client;
 	private DataInputStream input;
 	private DataOutputStream output;
@@ -97,7 +117,7 @@ class ClientHandler extends Thread
 
 	public ClientHandler(Socket socket)
 	{
-		
+
 		//Set up reference to associated socket...
 		client = socket;
 		
@@ -135,7 +155,7 @@ class ClientHandler extends Thread
 			System.out.println(clientName + " has been registered to the system");
 		}
 
-		AuctionServerProtocol protocol = new AuctionServerProtocol(clientName);
+		protocol = new AuctionServerProtocol(clientName);
 
 		
 

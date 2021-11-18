@@ -62,17 +62,29 @@ public class AuctionSystem {
 						String bidEndNotification = "Item "
 												 + currentBidItem.getName() 
 												 + " has been sold to " + currentBidItem.getHighestBidder();
+
+						
+
 						try {
 							AuctionServer.sendToAll(bidEndNotification);
-						} catch (IOException e1) {
+							
+						} catch (IOException e2) {
 							// TODO Auto-generated catch block
-							e1.printStackTrace();
+							e2.printStackTrace();
 						}
 
                         //get the next item to sell
 						if( getNextBidItem() != null ) { 
 							currentBidItem = getNextBidItem();
 							seconds = currentBidItem.getBidPeriod();
+
+							try {
+								AuctionServer.resetStateForAllClients();
+							} catch (IOException e2) {
+								// TODO Auto-generated catch block
+								e2.printStackTrace();
+							}
+	
 						} else {
 
 							currentBidItem = null;
@@ -97,19 +109,19 @@ public class AuctionSystem {
 
     //method returns string if bid price is updated successfully 
     //or returns null if an error occurred when updating the bid price
-    static String updateBidPrice(float price, String clientBidding) { 
+    static String updateBidPrice(float price, String client) { 
        
 
         if(price > currentBidItem.getPrice()) { 
             currentBidItem.setPrice(price);
-			currentBidItem.setHighestBidder(clientBidding);
+			currentBidItem.setHighestBidder(client);
 
 			//restart timer
 			timer.cancel();
 			countDownBidPeriod();
 
-            return String.format("Bid for %s updated. New selling price is %.2f.\nBid expires in %d seconds.\n",
-								 currentBidItem.getName(), currentBidItem.getPrice(), currentBidItem.getBidPeriod());
+            return String.format("Bid for %s updated by %s. New selling price is %.2f.\nBid expires in %d seconds.\n",
+								 currentBidItem.getName(), client, currentBidItem.getPrice(), currentBidItem.getBidPeriod());
             
 			//TODO NOTIFY CLIENTS
         }         

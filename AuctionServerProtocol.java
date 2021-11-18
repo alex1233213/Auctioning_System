@@ -3,7 +3,6 @@ public class AuctionServerProtocol {
     private static final int INITIAL = 0;
     private static final int RECEIVE_CHOICE = 1;
     private static final int RECEIVE_BID = 2;
-    private static final int DEFAULT = 3;
     private int state;
     private String clientName;
     private static String defaltMsg;
@@ -21,6 +20,9 @@ public class AuctionServerProtocol {
 
 
     
+    public void changeStateToReceive() { 
+        this.state = RECEIVE_CHOICE;
+    }
 
     
     //Method to determine the state of communication between client and server
@@ -69,8 +71,12 @@ public class AuctionServerProtocol {
                     output = String.format("The value of the bid must be greater than current bid - %.2f euro. Try again.\n" + 
                                             "Enter bid amount:\n", bidItem.getPrice());
                 } else { 
-                    output = output + "\n\n" + getDefaultMessage();
+                    
+                    //inform all users of the bid
                     AuctionServer.sendToAll(output);
+                    
+                    //message for the user
+                    output = "\n\n" + "Bid has been successful\n" + getDefaultMessage();
                     state = RECEIVE_CHOICE;
                 }
                 
@@ -80,14 +86,7 @@ public class AuctionServerProtocol {
                                  + bidItem.getPrice();
             }           
         
-        } else if(state == DEFAULT) { 
-            defaltMsg = getDefaultMessage();
-            output = defaltMsg;
-
-            state = RECEIVE_CHOICE;
         }
-        
-        
         
         return output;
     }
