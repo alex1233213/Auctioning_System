@@ -116,8 +116,6 @@ class ClientHandler extends Thread
 	
 	public void run()
 	{	
-		AuctionServerProtocol protocol = new AuctionServerProtocol();
-
 		//get client's name when they connect to server
 		try {
 			String registeringClient = input.readUTF();
@@ -136,6 +134,9 @@ class ClientHandler extends Thread
 		if(clientName != null) { 
 			System.out.println(clientName + " has been registered to the system");
 		}
+
+		AuctionServerProtocol protocol = new AuctionServerProtocol(clientName);
+
 		
 
 		String clientInput;

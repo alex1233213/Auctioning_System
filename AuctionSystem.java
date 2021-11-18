@@ -97,12 +97,12 @@ public class AuctionSystem {
 
     //method returns string if bid price is updated successfully 
     //or returns null if an error occurred when updating the bid price
-    static String updateBidPrice(float price) { 
+    static String updateBidPrice(float price, String clientBidding) { 
        
 
         if(price > currentBidItem.getPrice()) { 
             currentBidItem.setPrice(price);
-			currentBidItem.setHighestBidder("user");
+			currentBidItem.setHighestBidder(clientBidding);
 
 			//restart timer
 			timer.cancel();

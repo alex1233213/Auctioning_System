@@ -5,13 +5,14 @@ public class AuctionServerProtocol {
     private static final int RECEIVE_BID = 2;
     private static final int DEFAULT = 3;
     private int state;
-
+    private String clientName;
     private static String defaltMsg;
     
 
 
-    public AuctionServerProtocol() { 
+    public AuctionServerProtocol(String clientName) { 
         this.state = INITIAL;
+        this.clientName = clientName;
 
         defaltMsg = String.format("Current item for sale is %s - price is %.2f euros\n" + 
                                     " * Enter 1 to place a bid on the item\n" + 
@@ -19,7 +20,7 @@ public class AuctionServerProtocol {
     }
 
 
-
+    
 
     
     //Method to determine the state of communication between client and server
@@ -62,8 +63,8 @@ public class AuctionServerProtocol {
             //value expected is the bid value
             try { 
                 float bidEntered = Float.parseFloat(input);
-                output = AuctionSystem.updateBidPrice(bidEntered);
-                
+                output = AuctionSystem.updateBidPrice(bidEntered, clientName);
+
                 if(output == null) { 
                     output = String.format("The value of the bid must be greater than current bid - %.2f euro. Try again.\n" + 
                                             "Enter bid amount:\n", bidItem.getPrice());
