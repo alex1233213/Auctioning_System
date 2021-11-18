@@ -26,6 +26,23 @@ public class AuctionServer
     }
 
 
+	//will return true if the client is already registered to the system
+	public static boolean clientExists(String clientName) {
+		
+		for(int i = 0; i < clientList.size() ; ++i) { 
+			if(clientList.get(i).getClientName() == null) { 
+				continue;
+			}
+
+			if( clientList.get(i).getClientName().equals(clientName) ) { 
+				return true;
+		    }
+		}
+
+		return false;
+	}
+
+
 
 	public static void main(String[] args) throws IOException
 	{
@@ -48,8 +65,6 @@ public class AuctionServer
 			//Wait for client...
 			Socket client = serverSocket.accept();
 
-			System.out.println("\nNew client accepted.\n");
-
 			//Create a thread to handle communication with
 			//this client and pass the constructor for this
 			//thread a reference to the relevant socket...
@@ -67,7 +82,12 @@ class ClientHandler extends Thread
 	private Socket client;
 	private DataInputStream input;
 	private DataOutputStream output;
+	private String clientName;
 
+
+	public String getClientName() {
+		return clientName;
+	}
 
 	public DataOutputStream getOutput() {
 		return output;
@@ -77,9 +97,10 @@ class ClientHandler extends Thread
 
 	public ClientHandler(Socket socket)
 	{
-
+		
 		//Set up reference to associated socket...
 		client = socket;
+		
 
 		try
 		{
@@ -97,9 +118,30 @@ class ClientHandler extends Thread
 	{	
 		AuctionServerProtocol protocol = new AuctionServerProtocol();
 
+		//get client's name when they connect to server
+		try {
+			String registeringClient = input.readUTF();
+
+			if( AuctionServer.clientExists(registeringClient) == false ) {
+				clientName = registeringClient;
+			} else { 
+				output.writeUTF("Client " + registeringClient + " is already registered to the system");
+				output.writeUTF("QUIT");
+				interrupt();
+			}
+		} catch (IOException e2) {
+			e2.printStackTrace();
+		}
+
+		if(clientName != null) { 
+			System.out.println(clientName + " has been registered to the system");
+		}
+		
+
 		String clientInput;
 		String outputLine;
 
+		//send the initial menu to the client
 		outputLine = protocol.processInput(null);
         try {
 			output.writeUTF(outputLine);
@@ -108,7 +150,7 @@ class ClientHandler extends Thread
 		}
 
 		try {
-			while ( ( clientInput = input.readUTF()) != null ) {
+			while ( ( clientInput = input.readUTF() ) != null ) {
 				outputLine = protocol.processInput(clientInput);
 
 				try {
@@ -133,6 +175,7 @@ class ClientHandler extends Thread
 			{
 				System.out.println(
 							"Closing down connection...");
+				
 				client.close();
 			}
 		}

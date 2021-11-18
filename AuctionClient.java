@@ -13,10 +13,12 @@ import java.util.*;
 
 public class AuctionClient
 {
+	private static String clientName;
 	private static InetAddress host;
 	private static final int PORT = 1234;
 	private static Socket socket;
 
+	//thread that receives messages from the server
 	final static Thread receiveMsgThread = new Thread() {
 		
 		@Override
@@ -73,17 +75,20 @@ public class AuctionClient
 	};
 
 
-	
+	//thread for writing messages from the server
 	final static Thread sendMsgThread = new Thread() {
 		
 		@Override
 		public void run() {
-
+			
 		
 			try {
 
 				//for writing to the server
 				DataOutputStream networkOutput = new DataOutputStream(socket.getOutputStream());
+
+				//send the client name to the server
+				networkOutput.writeUTF(clientName);
 
 				//Set up stream for keyboard entry...
 				Scanner userEntry = new Scanner(System.in);
@@ -109,6 +114,14 @@ public class AuctionClient
 
 	public static void main(String[] args) throws IOException
 	{
+		if(args.length != 1) { 
+			System.out.println("Invalid no. of parameters\nUsage: java AuctionClient <clientName>");
+			System.exit(-1);
+		} else { 
+			clientName = args[0];
+			System.out.println(clientName);
+		}
+
 		try
 		{
 			host = InetAddress.getLocalHost();
