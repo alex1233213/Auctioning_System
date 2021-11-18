@@ -13,12 +13,9 @@ public class AuctionServerProtocol {
     public AuctionServerProtocol() { 
         this.state = INITIAL;
 
-
-        bidItem = AuctionServer.getCurrentBidItem();
-
         defaltMsg = String.format("Current item for sale is %s - price is %.2f euros\n" + 
                                     " * Enter 1 to place a bid on the item\n" + 
-                                    " * Enter 5 to quit\n", AuctionServer.getCurrentBidItem().getName(), AuctionServer.getCurrentBidItem().getPrice());
+                                    " * Enter 5 to quit\n", AuctionSystem.getCurrentBidItem().getName(), AuctionSystem.getCurrentBidItem().getPrice());
     }
 
 
@@ -37,6 +34,7 @@ public class AuctionServerProtocol {
     //The different states determine what message the client should receive.
     public String processInput(String input) { 
         String output = null;
+        bidItem = AuctionSystem.getCurrentBidItem();
 
         if( state == INITIAL ) { 
 
@@ -78,7 +76,7 @@ public class AuctionServerProtocol {
                 if(bidEntered > currentPrice) { 
 
                     bidItem.setPrice(bidEntered);
-                    bidItem = AuctionServer.getCurrentBidItem();
+                    bidItem = AuctionSystem.getCurrentBidItem();
                     
                     output = String.format("Bid updated. New selling price is %.2f", bidItem.getPrice());
                     AuctionServer.sendToAll(output);
@@ -113,6 +111,6 @@ public class AuctionServerProtocol {
     public String getDefaultMessage() { 
         return String.format("Current item for sale is %s - price is %.2f euros\n" + 
                 " * Enter 1 to place a bid on the item\n" + 
-                " * Enter 5 to quit\n", AuctionServer.getCurrentBidItem().getName(), AuctionServer.getCurrentBidItem().getPrice());
+                " * Enter 5 to quit\n", AuctionSystem.getCurrentBidItem().getName(), AuctionSystem.getCurrentBidItem().getPrice());
     }
 }
