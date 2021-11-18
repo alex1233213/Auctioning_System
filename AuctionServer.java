@@ -22,56 +22,87 @@ public class AuctionServer
 	private static List<BidItem> bidItems = new ArrayList<>();
 	private static BidItem currentBidItem;
 
-	public static void main(String[] args) throws IOException
-	{
-		AuctionServer auctionServer = new AuctionServer();
 
-		bidItems.add(new BidItem("Bicycle", 100f, 3));
-		bidItems.add(new BidItem("Keyboard", 10f, 5));
-		bidItems.add(new BidItem("Mouse", 7.5f, 60));
-		bidItems.add(new BidItem("Monitor", 120f, 60));
-		bidItems.add(new BidItem("HDMI cable", 5.5f, 60));
+	public static BidItem getCurrentBidItem() {
+		return currentBidItem;
+	}
 
-		
 
+	public static void sendToAll(String message) throws IOException {
+        for(ClientHandler client : clientList) {
+            client.getOutput().writeUTF(message);
+		}
+    }
+
+	//scan through the bid items list and return the next item that is not sold
+	static BidItem getNextBidItem() { 
+
+		for(int i = 0 ; i < bidItems.size(); ++i) { 
+			if( bidItems.get(i).isSold() == false ) { 
+				return bidItems.get(i);
+			}
+		}
+
+		return null;
+	}
+
+
+	static void countDownBidPeriod() { 
 		Timer timer = new Timer();
 		
 		//start at the first item in the list
 		currentBidItem = bidItems.get(0);
 
+		float originalPrice = currentBidItem.getPrice();
+
 		timer.scheduleAtFixedRate(new TimerTask() {
-		int seconds = currentBidItem.getBidPeriod();
-			
+			int seconds = currentBidItem.getBidPeriod();
+				
 
 			public void run() {
 				System.out.println(currentBidItem.getName() + " " + seconds--);
 				
-				//timer expires and item is sold
-				if ( seconds < 0 && currentBidItem.isSold()) {
+				//timer expires
+				if ( seconds < 0 ) {
 					
-					currentBidItem = getNextBidItem();
-
-					//when there are no items left to sell, inform all users
-					if(currentBidItem == null) { 
+					//if the price is different than initial price means then mark product as sold 
+					//and get the next product
+					if( currentBidItem.getPrice() != originalPrice ) { 
+						currentBidItem.setSold(true);
 						try {
-							sendToAll("All items are sold. Please check later on for new bids");
-							timer.cancel();
+							sendToAll(String.format("%s has been sold for %.2f euro",
+													 currentBidItem.getName(),
+													 currentBidItem.getPrice()) );
+
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
-						// System.out.prinln(" ")
-					} else  {
+						
+						//get the next item in the product list, if there is any
+						if( getNextBidItem() != null ) { 
+							currentBidItem = getNextBidItem();
+							seconds = currentBidItem.getBidPeriod();
+						}
+					} else { //when price is the same, reset the timer to original product's bid period
 						seconds = currentBidItem.getBidPeriod();
 					}
-					
-				//bid period ends and item has not been sold 
-				} else if( seconds < 0 && (currentBidItem.isSold() ) == false)  {
-					//reset timer for the current item
-					seconds = currentBidItem.getBidPeriod();
 				}
 			}
 		}, 0, 1000);
+	}
+
+
+
+	public static void main(String[] args) throws IOException
+	{
+
+		bidItems.add(new BidItem("Bicycle", 100f, 3));
+		bidItems.add(new BidItem("Keyboard", 10f, 60));
+		bidItems.add(new BidItem("Mouse", 7.5f, 60));
+		bidItems.add(new BidItem("Monitor", 120f, 60));
+		bidItems.add(new BidItem("HDMI cable", 5.5f, 60));
 		
+		countDownBidPeriod();
 
 		try
 		{
@@ -95,30 +126,11 @@ public class AuctionServer
 			//this client and pass the constructor for this
 			//thread a reference to the relevant socket...
 			ClientHandler clientHandler = new ClientHandler(client);
-			clientHandler.setAuctionServer(auctionServer);
+			// clientHandler.setAuctionServer(auctionServer);
 
 			clientList.add(clientHandler);
 			clientHandler.start();//As usual, this method calls run.
 		}while (true);
-	}
-
-
-	public static void sendToAll(String message) throws IOException {
-        for(ClientHandler client : clientList) {
-            client.getOutput().writeUTF(message);
-		}
-    }
-
-	//scan through the bid items list and return the next item that is not sold
-	static BidItem getNextBidItem() { 
-
-		for(int i = 0 ; i < bidItems.size(); ++i) { 
-			if( bidItems.get(i).isSold() == false ) { 
-				return bidItems.get(i);
-			}
-		}
-
-		return null;
 	}
 
 }
@@ -129,17 +141,7 @@ class ClientHandler extends Thread
 	private Socket client;
 	private DataInputStream input;
 	private DataOutputStream output;
-	private AuctionServer auctionServer;
 
-
-	public AuctionServer getAuctionServer() {
-		return auctionServer;
-	}
-
-
-	public void setAuctionServer(AuctionServer auctionServer) {
-		this.auctionServer = auctionServer;
-	}
 
 
 	public Socket getClient() {
@@ -152,23 +154,9 @@ class ClientHandler extends Thread
 	}
 
 
-	public DataInputStream getInput() {
-		return input;
-	}
-
-
-	public void setInput(DataInputStream input) {
-		this.input = input;
-	}
-
 
 	public DataOutputStream getOutput() {
 		return output;
-	}
-
-
-	public void setOutput(DataOutputStream output) {
-		this.output = output;
 	}
 
 
@@ -193,7 +181,7 @@ class ClientHandler extends Thread
 	
 	public void run()
 	{	
-		AuctionServerProtocol protocol = new AuctionServerProtocol(auctionServer);
+		AuctionServerProtocol protocol = new AuctionServerProtocol();
 
 		String clientInput;
 		String outputLine;
