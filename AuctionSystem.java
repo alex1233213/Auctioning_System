@@ -10,7 +10,7 @@ public class AuctionSystem {
 	static Timer timer;
 
     public AuctionSystem() { 
-        bidItems.add(new BidItem("Bicycle", 100f, 20));
+        bidItems.add(new BidItem("Bicycle", 100f, 5));
 		bidItems.add(new BidItem("Keyboard", 10f, 5));
 		bidItems.add(new BidItem("Mouse", 7.5f, bidPeriod));
 		bidItems.add(new BidItem("Monitor", 120f, bidPeriod));

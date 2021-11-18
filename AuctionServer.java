@@ -54,8 +54,6 @@ public class AuctionServer
 			//this client and pass the constructor for this
 			//thread a reference to the relevant socket...
 			ClientHandler clientHandler = new ClientHandler(client);
-			// clientHandler.setAuctionServer(auctionServer);
-
 			clientList.add(clientHandler);
 			clientHandler.start();//As usual, this method calls run.
 		}while (true);
