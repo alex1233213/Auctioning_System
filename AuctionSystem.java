@@ -6,15 +6,15 @@ import java.util.TimerTask;
 public class AuctionSystem {
     private static List<BidItem> bidItems = new ArrayList<>();
 	private static BidItem currentBidItem;
-
-
+	private static int bidPeriod = 60;
+	static Timer timer;
 
     public AuctionSystem() { 
-        bidItems.add(new BidItem("Bicycle", 100f, 30));
-		bidItems.add(new BidItem("Keyboard", 10f, 60));
-		bidItems.add(new BidItem("Mouse", 7.5f, 60));
-		bidItems.add(new BidItem("Monitor", 120f, 60));
-		bidItems.add(new BidItem("HDMI cable", 5.5f, 60));
+        bidItems.add(new BidItem("Bicycle", 100f, 20));
+		bidItems.add(new BidItem("Keyboard", 10f, 5));
+		bidItems.add(new BidItem("Mouse", 7.5f, bidPeriod));
+		bidItems.add(new BidItem("Monitor", 120f, bidPeriod));
+		bidItems.add(new BidItem("HDMI cable", 5.5f, bidPeriod));
 
         //start auctioning first item in the list
 		currentBidItem = bidItems.get(0);
@@ -42,13 +42,12 @@ public class AuctionSystem {
 
 
     static void countDownBidPeriod() { 
-		Timer timer = new Timer();
+		timer = new Timer();
 
 		float originalPrice = currentBidItem.getPrice();
 
 		timer.scheduleAtFixedRate(new TimerTask() {
 			int seconds = currentBidItem.getBidPeriod();
-				
 
 			public void run() {
 				System.out.println(currentBidItem.getName() + " " + seconds--);
@@ -65,6 +64,12 @@ public class AuctionSystem {
 						if( getNextBidItem() != null ) { 
 							currentBidItem = getNextBidItem();
 							seconds = currentBidItem.getBidPeriod();
+						} else {
+
+							currentBidItem = null;
+							// timer.cancel();
+							//TODO ******NOTIFY CLIENTS ALL ITEMS SOLD */
+
 						}
 					} else { //when price is the same, reset the timer to original product's bid period
 						seconds = currentBidItem.getBidPeriod();
@@ -83,6 +88,10 @@ public class AuctionSystem {
         if(price > currentBidItem.getPrice()) { 
             currentBidItem.setPrice(price);
 
+			//restart timer
+			timer.cancel();
+			countDownBidPeriod();
+
             return String.format("Bid updated. New selling price is %.2f", currentBidItem.getPrice());
             
 			//TODO NOTIFY CLIENTS
@@ -90,6 +99,8 @@ public class AuctionSystem {
 
         return null;
     }
+
+
 
 
 
