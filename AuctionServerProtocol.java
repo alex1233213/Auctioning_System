@@ -50,11 +50,16 @@ public class AuctionServerProtocol {
 
         } else if( state == RECEIVE_CHOICE_MENU ) { 
 
-            if(input.equals("1")) { 
-                output = String.format("\nJoined Auction\nCurrent item for sale is %s - price is %.2f euros\n" + 
-                                            " * Enter 1 to place a bid on the item\n" + 
-                                            " * Enter 2 to leave the auction\n", AuctionSystem.getCurrentBidItem().getName()
-                                            , AuctionSystem.getCurrentBidItem().getPrice());;
+            if( input.equals("1") ) { 
+                // output = String.format("\nJoined Auction\nCurrent item for sale is %s - price is %.2f euros\n" + 
+                //                             " * Enter 1 to place a bid on the item\n" + 
+                //                             " * Enter 2 to leave the auction\n", AuctionSystem.getCurrentBidItem().getName()
+                //                             , AuctionSystem.getCurrentBidItem().getPrice());
+
+                output = AuctionSystem.getAuctionItems();
+                output += "\n * Enter 1 to place a bid on the item\n" + 
+                            " * Enter 2 to leave the auction\n";
+                
                 state = RECEIVE_CHOICE_AUCTION;
             } else if(input.equals("5")) {
 

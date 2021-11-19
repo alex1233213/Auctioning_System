@@ -130,14 +130,29 @@ public class AuctionSystem {
 
 
 
-	// static String getAuctionItems() {
-	// 	String result = "Items in the auction\n-------------------------\n";
+	static String getAuctionItems() {
+		String result = "Items in the auction\n-----------------------------\n";
 
-	// 	for(BidItem bidItem: bidItems) { 
-	// 		result += bidItem.getName() + "\n";
-	// 	}
+		for(BidItem bidItem: bidItems) { 
+			String status;
 
-	// 	return result;
-	// }
+			if( bidItem.isSold() != true ) { 
+				if( currentBidItem.equals(bidItem) ) { 
+					status = "started";
+				} else { //item is queued for sale
+					status = "not started";
+				}
+			} else { 
+				status = "sold";
+			}
+			result += " * " + bidItem.getName() + "\t\tstatus: " + status + "\n";
+		}
+
+
+		result += "\nCurrent item for sale is " + currentBidItem.getName() + " - price is " + currentBidItem.getPrice();
+
+		return result;
+	}
+
 
 }
