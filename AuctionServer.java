@@ -9,6 +9,7 @@ import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 
 
@@ -75,12 +76,14 @@ public class AuctionServer
 
 	public static void main(String[] args) throws IOException
 	{
+		System.out.println("Started Auctioning Server");
+		AddBidItemThread addBidItemThread = new AddBidItemThread();
+		addBidItemThread.start();
 
 		new AuctionSystem();
 
 		try
 		{
-			System.out.println("Started Auctioning Server");
 			serverSocket = new ServerSocket(PORT);
 		}
 		catch (IOException ioEx)
@@ -104,6 +107,45 @@ public class AuctionServer
 	}
 
 }
+
+
+//Thread that allows including new items for sale in the auction server
+class AddBidItemThread extends Thread { 
+	Scanner addBidItemScanner = new Scanner(System.in);
+	
+	public void run() { 
+		System.out.println("Enter '+' to add an item to the auction system");
+
+		while(true) { 
+			if(addBidItemScanner.nextLine().equals("+")) { 
+
+				try { 
+					System.out.println("Enter the name of the auction item");
+					String name = addBidItemScanner.nextLine();
+
+					System.out.println("Enter the price for the item");
+					float price = addBidItemScanner.nextFloat();
+	
+					System.out.println("Enter the bid period for the item in seconds");
+					int bidPeriod = addBidItemScanner.nextInt();
+	
+					if(bidPeriod > 60) { 
+						System.out.println("Bid item could not be added. Max period must be 60 seconds\nEnter '+' to try again");
+					} else { 
+						AuctionSystem.getBidItems().add(new BidItem(name, price, bidPeriod)); 
+						System.out.println("Successfully added item to auction system. Enter '+' to add another item");
+					}
+				} catch (Exception e) { 
+					e.printStackTrace();
+					System.out.println("Could not add a auction item");
+				}
+			}
+		}
+	}
+
+
+}
+
 
 
 class ClientHandler extends Thread

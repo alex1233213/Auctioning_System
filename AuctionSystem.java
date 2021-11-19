@@ -23,6 +23,12 @@ public class AuctionSystem {
 		countDownBidPeriod();
     }
 
+
+	public static List<BidItem> getBidItems() {
+		return bidItems;
+	}
+
+
     //scan through the bid items list and return the next item that is not sold
 	static BidItem getNextBidItem() { 
 
@@ -145,11 +151,11 @@ public class AuctionSystem {
 			} else { 
 				status = "sold";
 			}
-			result += " * " + bidItem.getName() + "\t\tstatus: " + status + "\n";
+			result += " * " + bidItem.getName()  + "\t\tprice: " + bidItem.getPrice() + "\t\tstatus: " + status + "\n";
 		}
 
 
-		result += "\nCurrent item for sale is " + currentBidItem.getName() + " - price is " + currentBidItem.getPrice();
+		result += "\nCurrent item for sale is " + currentBidItem.getName() + " - price is " + currentBidItem.getPrice() + " euro";
 
 		return result;
 	}

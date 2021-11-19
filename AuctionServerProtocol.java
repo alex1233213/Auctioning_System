@@ -1,7 +1,7 @@
 public class AuctionServerProtocol { 
     private static BidItem bidItem;
     private static final int INITIAL = 0;
-    private static final int RECEIVE_CHOICE_AUCTION = 1;
+    private static final int AUCTION_MENU = 1;
     private static final int RECEIVE_BID = 2;
     private static final int RECEIVE_CHOICE_MENU = 3;
     private int state;
@@ -27,7 +27,7 @@ public class AuctionServerProtocol {
 
     
     public void changeStateToReceive() { 
-        this.state = RECEIVE_CHOICE_AUCTION;
+        this.state = AUCTION_MENU;
     }
 
     
@@ -39,36 +39,28 @@ public class AuctionServerProtocol {
 
         if( state == INITIAL ) { 
 
-            output = "------------------------------------------------------\n" +
-                     "                  Auction System\n" + 
-                     "------------------------------------------------------\n" + 
-                     " * Enter 1 to join the auction\n" +
-                     " * Enter 5 to quit\n";
+            output = mainMenu;
             
             state = RECEIVE_CHOICE_MENU;
         
-
+        //receiving option from main menu
         } else if( state == RECEIVE_CHOICE_MENU ) { 
 
             if( input.equals("1") ) { 
-                // output = String.format("\nJoined Auction\nCurrent item for sale is %s - price is %.2f euros\n" + 
-                //                             " * Enter 1 to place a bid on the item\n" + 
-                //                             " * Enter 2 to leave the auction\n", AuctionSystem.getCurrentBidItem().getName()
-                //                             , AuctionSystem.getCurrentBidItem().getPrice());
-
+                
                 output = AuctionSystem.getAuctionItems();
                 output += "\n * Enter 1 to place a bid on the item\n" + 
                             " * Enter 2 to leave the auction\n";
                 
-                state = RECEIVE_CHOICE_AUCTION;
-            } else if(input.equals("5")) {
+                state = AUCTION_MENU;
+            } else if( input.equals("5") ) {
 
                 output = "QUIT";
 
             }
         
         //check on the choice entered by the user
-        } else if ( state == RECEIVE_CHOICE_AUCTION) {
+        } else if ( state == AUCTION_MENU) {
 
             if ( input.equals("1") ) {
 
@@ -95,9 +87,15 @@ public class AuctionServerProtocol {
                 float bidEntered = Float.parseFloat(input);
                 output = AuctionSystem.updateBidPrice(bidEntered, clientName);
 
+                //when a bid could not be placed output will be null
                 if(output == null) { 
-                    output = String.format("The value of the bid must be greater than current bid - %.2f euro. Try again.\n" + 
-                                            "Enter bid amount:\n", bidItem.getPrice());
+                    output = String.format("Invalid entry. The value of the bid must be greater than current bid - %.2f euro." 
+                                            , bidItem.getPrice());
+
+                    output += "\n * Enter 1 to place a bid on the item\n" + 
+                                " * Enter 2 to leave the auction\n";
+                    state = AUCTION_MENU;
+                    
                 } else { 
                     
                     //inform all users of the bid
@@ -105,13 +103,16 @@ public class AuctionServerProtocol {
                     
                     //message for the user
                     output = "\n\n" + "Bid has been successful\n" + getDefaultMessage();
-                    state = RECEIVE_CHOICE_AUCTION;
+                    state = AUCTION_MENU;
                 }
                 
                 
             }   catch (Exception e) { 
-                    output = "Invalid input, try again\nEnter new price greater than "
-                                 + bidItem.getPrice();
+                    output = "Invalid input.";
+                    output += "\n * Enter 1 to place a bid on the item\n" + 
+                                " * Enter 2 to leave the auction\n";
+                    
+                    state = AUCTION_MENU;
             }           
         
         }
