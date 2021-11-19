@@ -25,7 +25,7 @@ public class AuctionServer
 	 */
 	public static void sendToAllParticipants(String message) throws IOException {
         for(ClientHandler client : clientList) {
-			if( client.getProtocol().isReceiveMenuState()  == false ) { 
+			if( client.getProtocol().isReceivingOptionFromMenu()  == false ) { 
 				client.getOutput().writeUTF(message);
 			}
 		}
@@ -38,7 +38,7 @@ public class AuctionServer
 		is changed to respond to the notification sent. 
 	*/
 	public static void resetStateForAllClients() throws IOException {
-		String notification = String.format("\n\n\n\n\n\nCurrent item for sale is " +
+		String notification = String.format("\n\nCurrent item for sale is " +
 						 AuctionSystem.getCurrentBidItem().getName() + 
 						 " - price is %.2f euro" +
 						  "\n * Enter 1 to place a bid on the item\n" + 
@@ -48,10 +48,41 @@ public class AuctionServer
 		
 		for(ClientHandler client : clientList) {
 			//reset bidding state for clients unless the client is in the main menu
-			if( client.getProtocol().isReceiveMenuState()  == false ) {  
+			if( client.getProtocol().isReceivingOptionFromMenu()  == false ) {  
 				client.getProtocol().changeStateToReceive();
 			}
             
+		}
+	}
+
+
+	//method to notify clients when a bid item is sold
+	//highest bidder can receive notification about won bid from any state of the protocol
+	//all other clients are notified only if they have joined the auction
+	static void notifyBidSell(BidItem soldItem) { 
+		for(ClientHandler client: clientList) { 
+			//custom message for the client that won the bid
+			if( client.getClientName().equals(soldItem.getHighestBidder() ) ) { 
+				try {
+					client.getOutput().writeUTF("You have won the bid for the item " + soldItem.getName() + "\nCompleting transaction..");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else { // for any other client, only inform them if they have joined the auction
+				if( client.getProtocol().isReceivingOptionFromMenu()  == false ) { 
+					try {
+						client.getOutput().writeUTF(
+													"Item " + soldItem.getName() + 
+													" has been sold to " + soldItem.getHighestBidder() + 
+													" for " + soldItem.getPrice() + 
+													" euro\n"
+													);
+
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
 		}
 	}
 
@@ -71,6 +102,9 @@ public class AuctionServer
 
 		return false;
 	}
+
+
+	
 
 
 

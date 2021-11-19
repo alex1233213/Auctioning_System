@@ -21,7 +21,7 @@ public class AuctionServerProtocol {
     }
 
 
-    public boolean isReceiveMenuState() { 
+    public boolean isReceivingOptionFromMenu() { 
         return this.state == RECEIVE_CHOICE_MENU;
     }
 

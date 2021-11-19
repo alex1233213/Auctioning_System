@@ -65,20 +65,14 @@ public class AuctionSystem {
 					if( currentBidItem.getPrice() != currentBidItem.getListingPrice() ) { 
 						
 						currentBidItem.setSold(true);
-						String bidEndNotification = "Item "
-												 + currentBidItem.getName() 
-												 + " has been sold to " + currentBidItem.getHighestBidder();
+						// String bidEndNotification = "Item "
+						// 						 + currentBidItem.getName() 
+						// 						 + " has been sold to " + currentBidItem.getHighestBidder();
 
 						
-
-						try {
-							AuctionServer.sendToAllParticipants(bidEndNotification);
+						AuctionServer.notifyBidSell(currentBidItem);
 							
-						} catch (IOException e2) {
-							// TODO Auto-generated catch block
-							e2.printStackTrace();
-						}
-
+						
                         //get the next item to sell
 						if( getNextBidItem() != null ) { 
 							currentBidItem = getNextBidItem();
