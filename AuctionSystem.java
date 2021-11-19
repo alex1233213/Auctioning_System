@@ -66,7 +66,7 @@ public class AuctionSystem {
 						
 
 						try {
-							AuctionServer.sendToAll(bidEndNotification);
+							AuctionServer.sendToAllParticipants(bidEndNotification);
 							
 						} catch (IOException e2) {
 							// TODO Auto-generated catch block
@@ -91,7 +91,7 @@ public class AuctionSystem {
 							timer.cancel();
 
 							try {
-								AuctionServer.sendToAll("All items have been sold");
+								AuctionServer.sendToAllParticipants("All items have been sold");
 							} catch (IOException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -123,7 +123,6 @@ public class AuctionSystem {
             return String.format("Bid for %s updated by %s. New selling price is %.2f.\nBid expires in %d seconds.\n",
 								 currentBidItem.getName(), client, currentBidItem.getPrice(), currentBidItem.getBidPeriod());
             
-			//TODO NOTIFY CLIENTS
         }         
 
         return null;
@@ -131,6 +130,14 @@ public class AuctionSystem {
 
 
 
+	// static String getAuctionItems() {
+	// 	String result = "Items in the auction\n-------------------------\n";
 
+	// 	for(BidItem bidItem: bidItems) { 
+	// 		result += bidItem.getName() + "\n";
+	// 	}
+
+	// 	return result;
+	// }
 
 }

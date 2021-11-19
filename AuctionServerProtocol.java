@@ -21,6 +21,10 @@ public class AuctionServerProtocol {
     }
 
 
+    public boolean isReceiveMenuState() { 
+        return this.state == RECEIVE_CHOICE_MENU;
+    }
+
     
     public void changeStateToReceive() { 
         this.state = RECEIVE_CHOICE_AUCTION;
@@ -44,7 +48,7 @@ public class AuctionServerProtocol {
             state = RECEIVE_CHOICE_MENU;
         
 
-        } else if( state == RECEIVE_CHOICE_MENU) { 
+        } else if( state == RECEIVE_CHOICE_MENU ) { 
 
             if(input.equals("1")) { 
                 output = String.format("\nJoined Auction\nCurrent item for sale is %s - price is %.2f euros\n" + 
@@ -92,7 +96,7 @@ public class AuctionServerProtocol {
                 } else { 
                     
                     //inform all users of the bid
-                    AuctionServer.sendToAll(output);
+                    AuctionServer.sendToAllParticipants(output);
                     
                     //message for the user
                     output = "\n\n" + "Bid has been successful\n" + getDefaultMessage();
@@ -117,6 +121,6 @@ public class AuctionServerProtocol {
         return String.format("Current item for sale is %s - price is %.2f euros\n" + 
                 " * Enter 1 to place a bid on the item\n" + 
                 " * Enter 2 to leave the auction\n", AuctionSystem.getCurrentBidItem().getName()
-                , AuctionSystem.getCurrentBidItem().getPrice());
+                , AuctionSystem.getCurrentBidItem().getPrice() );
     }
 }

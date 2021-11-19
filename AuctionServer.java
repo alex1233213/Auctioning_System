@@ -19,9 +19,14 @@ public class AuctionServer
 	private static List<ClientHandler> clientList = new ArrayList<>();
 
 
-	public static void sendToAll(String message) throws IOException {
+	/** 
+	 * Method that sends a message to all clients that have joined the auction
+	 */
+	public static void sendToAllParticipants(String message) throws IOException {
         for(ClientHandler client : clientList) {
-            client.getOutput().writeUTF(message);
+			if( client.getProtocol().isReceiveMenuState()  == false ) { 
+				client.getOutput().writeUTF(message);
+			}
 		}
     }
 
@@ -32,15 +37,20 @@ public class AuctionServer
 		is changed to respond to the notification sent. 
 	*/
 	public static void resetStateForAllClients() throws IOException {
-		String notification = String.format("\n\nCurrent item for sale is " +
+		String notification = String.format("\n\n\n\n\n\nCurrent item for sale is " +
 						 AuctionSystem.getCurrentBidItem().getName() + 
 						 " - price is %.2f euro" +
 						  "\n * Enter 1 to place a bid on the item\n" + 
-						 " * Enter 2 to leave auction.", AuctionSystem.getCurrentBidItem().getPrice());
-		sendToAll(notification);
+						 " * Enter 2 to leave auction.", AuctionSystem.getCurrentBidItem().getPrice() );
+		sendToAllParticipants(notification);
+
 		
 		for(ClientHandler client : clientList) {
-            client.getProtocol().changeStateToReceive();
+			//reset bidding state for clients unless the client is in the main menu
+			if( client.getProtocol().isReceiveMenuState()  == false ) {  
+				client.getProtocol().changeStateToReceive();
+			}
+            
 		}
 	}
 
@@ -160,8 +170,6 @@ class ClientHandler extends Thread
 		}
 
 		protocol = new AuctionServerProtocol(clientName);
-
-		
 
 		String clientInput;
 		String outputLine;
