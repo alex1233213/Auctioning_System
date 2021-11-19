@@ -36,11 +36,11 @@ public class AuctionServer
 						 AuctionSystem.getCurrentBidItem().getName() + 
 						 " - price is %.2f euro" +
 						  "\n * Enter 1 to place a bid on the item\n" + 
-						 " * Enter 2 to quit.", AuctionSystem.getCurrentBidItem().getPrice());
+						 " * Enter 2 to leave auction.", AuctionSystem.getCurrentBidItem().getPrice());
 		sendToAll(notification);
 		
 		for(ClientHandler client : clientList) {
-            client.protocol.changeStateToReceive();
+            client.getProtocol().changeStateToReceive();
 		}
 	}
 
@@ -98,12 +98,16 @@ public class AuctionServer
 
 class ClientHandler extends Thread
 {
-	AuctionServerProtocol protocol;
+	private AuctionServerProtocol protocol;
 	private Socket client;
 	private DataInputStream input;
 	private DataOutputStream output;
 	private String clientName;
 
+
+	public AuctionServerProtocol getProtocol() {
+		return protocol;
+	}
 
 	public String getClientName() {
 		return clientName;
