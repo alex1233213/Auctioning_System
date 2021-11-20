@@ -7,6 +7,7 @@ public class AuctionServerProtocol {
     private int state;
     private String clientName;
     private static String mainMenu;
+    private static String auctionMenuMsg;
     
 
 
@@ -18,7 +19,13 @@ public class AuctionServerProtocol {
                     "------------------------------------------------------\n" + 
                     " * Enter 1 to join the auction\n" +
                     " * Enter 5 to quit\n\n\n\n>>";
+
+
+        auctionMenuMsg = "\n * Enter 1 to place a bid on the item\n" + 
+                                " * Enter 2 to leave the auction\n\n\n\n>>";
     }
+
+
 
 
     public boolean isReceivingOptionFromMenu() { 
@@ -49,14 +56,16 @@ public class AuctionServerProtocol {
             if( input.equals("1") ) { 
                 
                 output = AuctionSystem.getAuctionItems();
-                output += "\n * Enter 1 to place a bid on the item\n" + 
-                            " * Enter 2 to leave the auction\n";
+                output += auctionMenuMsg;
                 
                 state = AUCTION_MENU;
             } else if( input.equals("5") ) {
 
                 output = "QUIT";
 
+            } else {  
+
+                output = "Invalid entry\n" + mainMenu;
             }
         
         //check on the choice entered by the user
@@ -64,7 +73,7 @@ public class AuctionServerProtocol {
 
             if ( input.equals("1") ) {
 
-                output = "Enter new bid for the item";
+                output = "Enter new bid for the item\n\n\n\n>>";
                 state = RECEIVE_BID;
 
             } else if( input.equals("2") ) {
@@ -74,8 +83,7 @@ public class AuctionServerProtocol {
                 
             } else {
 
-                output = "Invalid choice\n" + "* Enter 1 to place a bid on the item\n" + 
-                            "* Enter 2 to leave auction\n";
+                output = "Invalid choice\n" + getDefaultMessage();
 
             }
 
@@ -92,8 +100,7 @@ public class AuctionServerProtocol {
                     output = String.format("Invalid entry. The value of the bid must be greater than current bid - %.2f euro." 
                                             , bidItem.getPrice());
 
-                    output += "\n * Enter 1 to place a bid on the item\n" + 
-                                " * Enter 2 to leave the auction\n";
+                    output += auctionMenuMsg;
                     state = AUCTION_MENU;
                     
                 } else { 
@@ -106,8 +113,7 @@ public class AuctionServerProtocol {
                 
             }   catch (Exception e) { 
                     output = "Invalid input.";
-                    output += "\n * Enter 1 to place a bid on the item\n" + 
-                                " * Enter 2 to leave the auction\n";
+                    output += auctionMenuMsg;
                     
                     state = AUCTION_MENU;
             }           
@@ -120,11 +126,10 @@ public class AuctionServerProtocol {
 
 
 
-    public String getDefaultMessage() { 
-        return String.format("Current item for sale is %s - price is %.2f euros\n" + 
-                " * Enter 1 to place a bid on the item\n" + 
-                " * Enter 2 to leave the auction\n", AuctionSystem.getCurrentBidItem().getName()
-                , AuctionSystem.getCurrentBidItem().getPrice() );
+    public static String getDefaultMessage() { 
+        return String.format("Current item for sale is %s - price is %.2f euros\n" + auctionMenuMsg
+                                , AuctionSystem.getCurrentBidItem().getName()
+                                , AuctionSystem.getCurrentBidItem().getPrice() );
     }
 
 
@@ -132,10 +137,10 @@ public class AuctionServerProtocol {
     static void sendSellMsg(BidItem soldItem) {
         
         //create messages for informing users of the sold item 
-        String msgForBuyer = "You have won the bid for the item " + soldItem.getName() + "\nCompleting transaction..";
+        String msgForBuyer = "**Notification: You have won the bid for the item " + soldItem.getName() + "\nCompleting transaction..\n\n";
         
-        String msgForOthers = "Item " + soldItem.getName() + " has been sold to " + soldItem.getHighestBidder() + 
-                                " for " + soldItem.getPrice() + " euro\n";
+        String msgForOthers = "**Notification: Item " + soldItem.getName() + " has been sold to " + soldItem.getHighestBidder() + 
+                                " for " + soldItem.getPrice() + " euro\n\n";
 
         AuctionServer.notifyBidItemEvent(msgForBuyer, msgForOthers, soldItem);
     }
@@ -145,9 +150,9 @@ public class AuctionServerProtocol {
     static void sendBidMsg(BidItem bidItem) {
         
         //create messages for informing users of the sold item 
-        String msgForBuyer = "Your bid has been submitted for " + bidItem.getName();
+        String msgForBuyer = "**Notification: Your bid has been submitted for " + bidItem.getName() + "\n\n";
         
-        String msgForOthers = String.format("Bid for %s updated by %s. New selling price is %.2f.\nBid expires in %d seconds.\n",
+        String msgForOthers = String.format("**Notification: Bid for %s updated by %s. New selling price is %.2f.\nBid expires in %d seconds.\n\n",
                                             bidItem.getName(), bidItem.getHighestBidder(), bidItem.getPrice(), bidItem.getBidPeriod());
 
         AuctionServer.notifyBidItemEvent(msgForBuyer, msgForOthers, bidItem);

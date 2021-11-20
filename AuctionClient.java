@@ -41,7 +41,7 @@ public class AuctionClient
 				//continue communication with server until "QUIT" message received
 				while ( (msgFromServer = networkInput.readUTF() ) != null ) {
 				   
-					System.out.println(msgFromServer);
+					System.out.print(msgFromServer);
 	
 					if (msgFromServer.equalsIgnoreCase("QUIT")) {
 						break;
@@ -96,7 +96,6 @@ public class AuctionClient
 
 				//continue communication with server until "QUIT" message received
 				while ( !msgToServer.equals("5") ) {
-					System.out.print("\n>>");
 					msgToServer = userEntry.nextLine();
 					networkOutput.writeUTF(msgToServer);
 				}

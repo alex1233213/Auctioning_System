@@ -116,11 +116,6 @@ public class AuctionSystem {
 
 			return currentBidItem;
 
-            // return String.format("Bid for %s updated by %s. New selling price is %.2f.\nBid expires in %d seconds.\n",
-			// 					 currentBidItem.getName(), client, currentBidItem.getPrice(), currentBidItem.getBidPeriod());
-            
-
-			// AuctionServer.notifyNewBid();
         }         
 
         return null;
