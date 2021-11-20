@@ -122,6 +122,11 @@ public class AuctionSystem {
     }
 
 
+	static String currentItemToStr() { 
+		return "\nCurrent item for sale is " + currentBidItem.getName() + " - price is " + currentBidItem.getPrice() + " euro";
+	}
+
+
 
 	static String getAuctionItems() {
 		String result = "Items in the auction\n-----------------------------\n";
@@ -140,9 +145,6 @@ public class AuctionSystem {
 			}
 			result += " * " + bidItem.getName()  + "\t\tprice: " + bidItem.getPrice() + "\t\tstatus: " + status + "\n";
 		}
-
-
-		result += "\nCurrent item for sale is " + currentBidItem.getName() + " - price is " + currentBidItem.getPrice() + " euro";
 
 		return result;
 	}

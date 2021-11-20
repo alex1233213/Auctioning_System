@@ -22,11 +22,15 @@ public class AuctionServerProtocol {
 
 
         auctionMenuMsg = "\n * Enter 1 to place a bid on the item\n" + 
-                                " * Enter 2 to leave the auction\n\n\n\n>>";
+                                " * Enter 2 to leave the auction\n" + 
+                                " * Enter 3 to list all auction items\n\n\n\n>>";
     }
 
 
 
+    public static String getAuctionMenuMsg() {
+        return auctionMenuMsg;
+    }
 
     public boolean isReceivingOptionFromMenu() { 
         return this.state == RECEIVE_CHOICE_MENU;
@@ -55,7 +59,7 @@ public class AuctionServerProtocol {
 
             if( input.equals("1") ) { 
                 
-                output = AuctionSystem.getAuctionItems();
+                output = AuctionSystem.getAuctionItems() + AuctionSystem.currentItemToStr();
                 output += auctionMenuMsg;
                 
                 state = AUCTION_MENU;
@@ -81,7 +85,11 @@ public class AuctionServerProtocol {
                 output = "\nLeft Auction\n " + mainMenu;
                 state = RECEIVE_CHOICE_MENU;
                 
-            } else {
+            } else if(input.equals("3")) { 
+
+                output = AuctionSystem.getAuctionItems() + AuctionSystem.currentItemToStr() + getAuctionMenuMsg();
+
+            } else {    
 
                 output = "Invalid choice\n" + getDefaultMessage();
 

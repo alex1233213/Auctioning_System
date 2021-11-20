@@ -38,13 +38,13 @@ public class AuctionServer
 		is changed to respond to the notification sent. 
 	*/
 	public static void resetStateForAllClients() throws IOException {
-		String notification = String.format("\n\nCurrent item for sale is " +
-						 AuctionSystem.getCurrentBidItem().getName() + 
-						 " - price is %.2f euro" +
-						  "\n * Enter 1 to place a bid on the item\n" + 
-						 " * Enter 2 to leave auction.\n\n\n>>", AuctionSystem.getCurrentBidItem().getPrice());
+		// String notification = String.format("\n\nCurrent item for sale is " +
+		// 				 AuctionSystem.getCurrentBidItem().getName() + 
+		// 				 " - price is %.2f euro" +
+		// 				  "\n * Enter 1 to place a bid on the item\n" + 
+		// 				 " * Enter 2 to leave auction.\n\n\n>>", AuctionSystem.getCurrentBidItem().getPrice());
 
-		
+		String notification = AuctionServerProtocol.getDefaultMessage() + AuctionServerProtocol.getAuctionMenuMsg();
 
 		sendToAllParticipants(notification);
 
