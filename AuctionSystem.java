@@ -76,7 +76,8 @@ public class AuctionSystem {
 
 			public void run() {
 				// System.out.println(currentBidItem.getName() + " " + seconds--);
-				
+				seconds--;
+
 				//bid time expires
 				if ( seconds < 0 ) {
 					
