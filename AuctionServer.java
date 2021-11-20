@@ -20,6 +20,9 @@ public class AuctionServer
 	private static List<ClientHandler> clientList = new ArrayList<>();
 
 
+	public static List<ClientHandler> getClientList() {
+		return clientList;
+	}
 
 	static void endAuction() throws IOException {
 
@@ -290,6 +293,7 @@ class ClientHandler extends Thread
 		{
 			if (client!=null)
 			{
+				AuctionServer. getClientList().remove(this);
 				System.out.println(
 							"Closing down connection...");
 				
