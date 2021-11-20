@@ -20,6 +20,18 @@ public class AuctionServer
 	private static List<ClientHandler> clientList = new ArrayList<>();
 
 
+
+	static void endAuction() throws IOException {
+
+		for(ClientHandler client: clientList) { 
+			client.getOutput().writeUTF("All items have been sold. Please check at a later time for new items\n");
+			client.getOutput().writeUTF(AuctionServerProtocol.getMainMenu());
+			client.getProtocol().changeToMainMenu();
+		}
+	}
+
+
+
 	/** 
 	 * Method that sends a message to all clients that have joined the auction
 	 */
@@ -38,17 +50,10 @@ public class AuctionServer
 		is changed to respond to the notification sent. 
 	*/
 	public static void resetStateForAllClients() throws IOException {
-		// String notification = String.format("\n\nCurrent item for sale is " +
-		// 				 AuctionSystem.getCurrentBidItem().getName() + 
-		// 				 " - price is %.2f euro" +
-		// 				  "\n * Enter 1 to place a bid on the item\n" + 
-		// 				 " * Enter 2 to leave auction.\n\n\n>>", AuctionSystem.getCurrentBidItem().getPrice());
-
-		String notification = AuctionServerProtocol.getDefaultMessage() + AuctionServerProtocol.getAuctionMenuMsg();
+		String notification = AuctionServerProtocol.getDefaultMessage() ;
 
 		sendToAllParticipants(notification);
 
-		
 		for(ClientHandler client : clientList) {
 			//reset bidding state for clients unless the client is in the main menu
 			if( client.getProtocol().isReceivingOptionFromMenu()  == false ) {  
@@ -57,6 +62,9 @@ public class AuctionServer
             
 		}
 	}
+
+
+	
 
 
 	//method to notify clients when a bid item is sold or when the bid has been raised

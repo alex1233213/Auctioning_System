@@ -11,11 +11,11 @@ public class AuctionSystem {
 	static Timer timer;
 
     public AuctionSystem() { 
-        bidItems.add(new BidItem("Bicycle", 100f, 5));
-		bidItems.add(new BidItem("Keyboard", 10f, 5));
-		bidItems.add(new BidItem("Mouse", 7.5f, 5));
-		bidItems.add(new BidItem("Monitor", 120f, bidPeriod));
-		bidItems.add(new BidItem("HDMI cable", 5.5f, bidPeriod));
+        bidItems.add(new BidItem("Bicycle", 100f, 2));
+		// bidItems.add(new BidItem("Keyboard", 10f, 2));
+		// bidItems.add(new BidItem("Mouse", 7.5f, 2));
+		// bidItems.add(new BidItem("Monitor", 120f, 2));
+		// bidItems.add(new BidItem("HDMI cable", 5.5f, 2));
 
         //start auctioning first item in the list
 		currentBidItem = bidItems.get(0);
@@ -86,7 +86,7 @@ public class AuctionSystem {
 							timer.cancel();
 
 							try {
-								AuctionServer.sendToAllParticipants("All items have been sold");
+								AuctionServer.endAuction();
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
@@ -123,7 +123,11 @@ public class AuctionSystem {
 
 
 	static String currentItemToStr() { 
-		return "\nCurrent item for sale is " + currentBidItem.getName() + " - price is " + currentBidItem.getPrice() + " euro";
+		if(currentBidItem == null) { 
+			return null;
+		} else { 
+			return "\nCurrent item for sale is " + currentBidItem.getName() + " - price is " + currentBidItem.getPrice() + " euro";
+		}
 	}
 
 

@@ -28,6 +28,14 @@ public class AuctionServerProtocol {
 
 
 
+    public static String getMainMenu() {
+        return mainMenu;
+    }
+
+    public void changeToMainMenu() { 
+        this.state = RECEIVE_CHOICE_MENU;
+    }
+
     public static String getAuctionMenuMsg() {
         return auctionMenuMsg;
     }
@@ -59,10 +67,15 @@ public class AuctionServerProtocol {
 
             if( input.equals("1") ) { 
                 
-                output = AuctionSystem.getAuctionItems() + AuctionSystem.currentItemToStr();
-                output += auctionMenuMsg;
+                if( AuctionSystem.getCurrentBidItem() == null ) { 
+                    output = AuctionSystem.getAuctionItems() + "\nAll items have been sold. Please check at a later time for new items\n\n" + mainMenu;
+                } else { 
+                    output = AuctionSystem.getAuctionItems() + AuctionSystem.currentItemToStr();
+                    output += auctionMenuMsg;
+                    
+                    state = AUCTION_MENU;
+                }
                 
-                state = AUCTION_MENU;
             } else if( input.equals("5") ) {
 
                 output = "QUIT";
