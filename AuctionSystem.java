@@ -11,7 +11,7 @@ public class AuctionSystem {
 	static Timer timer;
 
     public AuctionSystem() { 
-        bidItems.add(new BidItem("Bicycle", 100f, 15));
+        bidItems.add(new BidItem("Bicycle", 100f, defaultBidPeriod));
 		bidItems.add(new BidItem("Keyboard", 10f, 15));
 		bidItems.add(new BidItem("Mouse", 7.5f, defaultBidPeriod));
 		bidItems.add(new BidItem("Monitor", 120f, defaultBidPeriod));
@@ -105,6 +105,16 @@ public class AuctionSystem {
 						}
 					} else { //when price is the same, reset the timer to original product's bid period
 						seconds = currentBidItem.getBidPeriod();
+					}
+
+				//notify clients every 15 seconds about the bid time remaining
+				} else if( (seconds % 15) == 0 && seconds != 0) { 
+					if( currentBidItem.getPrice() != currentBidItem.getListingPrice() ) { 
+						try {
+							AuctionServer.sendToAllParticipants("\n" + seconds +  " seconds remaining for bidding on item " + currentBidItem.getName() + "\n\n");
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
 					}
 				}
 			}
