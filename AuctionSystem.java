@@ -65,13 +65,9 @@ public class AuctionSystem {
 					if( currentBidItem.getPrice() != currentBidItem.getListingPrice() ) { 
 						
 						currentBidItem.setSold(true);
-						// String bidEndNotification = "Item "
-						// 						 + currentBidItem.getName() 
-						// 						 + " has been sold to " + currentBidItem.getHighestBidder();
 
 						
-						AuctionServer.notifyBidSell(currentBidItem);
-							
+						AuctionServerProtocol.sendSellMsg(currentBidItem);							
 						
                         //get the next item to sell
 						if( getNextBidItem() != null ) { 
@@ -81,7 +77,6 @@ public class AuctionSystem {
 							try {
 								AuctionServer.resetStateForAllClients();
 							} catch (IOException e2) {
-								// TODO Auto-generated catch block
 								e2.printStackTrace();
 							}
 	
@@ -93,7 +88,6 @@ public class AuctionSystem {
 							try {
 								AuctionServer.sendToAllParticipants("All items have been sold");
 							} catch (IOException e) {
-								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
 
@@ -109,7 +103,7 @@ public class AuctionSystem {
 
     //method returns string if bid price is updated successfully 
     //or returns null if an error occurred when updating the bid price
-    static String updateBidPrice(float price, String client) { 
+    static BidItem updateBidPrice(float price, String client) { 
        
 
         if(price > currentBidItem.getPrice()) { 
@@ -120,9 +114,13 @@ public class AuctionSystem {
 			timer.cancel();
 			countDownBidPeriod();
 
-            return String.format("Bid for %s updated by %s. New selling price is %.2f.\nBid expires in %d seconds.\n",
-								 currentBidItem.getName(), client, currentBidItem.getPrice(), currentBidItem.getBidPeriod());
+			return currentBidItem;
+
+            // return String.format("Bid for %s updated by %s. New selling price is %.2f.\nBid expires in %d seconds.\n",
+			// 					 currentBidItem.getName(), client, currentBidItem.getPrice(), currentBidItem.getBidPeriod());
             
+
+			// AuctionServer.notifyNewBid();
         }         
 
         return null;

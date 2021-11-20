@@ -17,7 +17,7 @@ public class AuctionServerProtocol {
                     "                  Auction System\n" + 
                     "------------------------------------------------------\n" + 
                     " * Enter 1 to join the auction\n" +
-                    " * Enter 5 to quit\n";
+                    " * Enter 5 to quit\n\n\n\n>>";
     }
 
 
@@ -85,10 +85,10 @@ public class AuctionServerProtocol {
             //value expected is the bid value
             try { 
                 float bidEntered = Float.parseFloat(input);
-                output = AuctionSystem.updateBidPrice(bidEntered, clientName);
+                BidItem updatedBid = AuctionSystem.updateBidPrice(bidEntered, clientName);
 
                 //when a bid could not be placed output will be null
-                if(output == null) { 
+                if(updatedBid == null) { 
                     output = String.format("Invalid entry. The value of the bid must be greater than current bid - %.2f euro." 
                                             , bidItem.getPrice());
 
@@ -97,12 +97,9 @@ public class AuctionServerProtocol {
                     state = AUCTION_MENU;
                     
                 } else { 
-                    
-                    //inform all users of the bid
-                    AuctionServer.sendToAllParticipants(output);
-                    
-                    //message for the user
-                    output = "\n\n" + "Bid has been successful\n" + getDefaultMessage();
+                    sendBidMsg(bidItem);
+                    output = "\n\n" + getDefaultMessage();
+
                     state = AUCTION_MENU;
                 }
                 
@@ -129,4 +126,33 @@ public class AuctionServerProtocol {
                 " * Enter 2 to leave the auction\n", AuctionSystem.getCurrentBidItem().getName()
                 , AuctionSystem.getCurrentBidItem().getPrice() );
     }
+
+
+
+    static void sendSellMsg(BidItem soldItem) {
+        
+        //create messages for informing users of the sold item 
+        String msgForBuyer = "You have won the bid for the item " + soldItem.getName() + "\nCompleting transaction..";
+        
+        String msgForOthers = "Item " + soldItem.getName() + " has been sold to " + soldItem.getHighestBidder() + 
+                                " for " + soldItem.getPrice() + " euro\n";
+
+        AuctionServer.notifyBidItemEvent(msgForBuyer, msgForOthers, soldItem);
+    }
+
+    
+
+    static void sendBidMsg(BidItem bidItem) {
+        
+        //create messages for informing users of the sold item 
+        String msgForBuyer = "Your bid has been submitted for " + bidItem.getName();
+        
+        String msgForOthers = String.format("Bid for %s updated by %s. New selling price is %.2f.\nBid expires in %d seconds.\n",
+                                            bidItem.getName(), bidItem.getHighestBidder(), bidItem.getPrice(), bidItem.getBidPeriod());
+
+        AuctionServer.notifyBidItemEvent(msgForBuyer, msgForOthers, bidItem);
+    }
+
+
+
 }

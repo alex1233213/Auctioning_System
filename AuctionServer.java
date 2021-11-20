@@ -56,28 +56,22 @@ public class AuctionServer
 	}
 
 
-	//method to notify clients when a bid item is sold
-	//highest bidder can receive notification about won bid from any state of the protocol
+	//method to notify clients when a bid item is sold or when the bid has been raised
+	//highest bidder can receive notification from any state of the protocol
 	//all other clients are notified only if they have joined the auction
-	static void notifyBidSell(BidItem soldItem) { 
+	static void notifyBidItemEvent(String msgForHighestBidder, String msgForOthers, BidItem bidItem) { 
 		for(ClientHandler client: clientList) { 
-			//custom message for the client that won the bid
-			if( client.getClientName().equals(soldItem.getHighestBidder() ) ) { 
+			//custom message for the highest bidder or buyer
+			if( client.getClientName().equals(bidItem.getHighestBidder() ) ) { 
 				try {
-					client.getOutput().writeUTF("You have won the bid for the item " + soldItem.getName() + "\nCompleting transaction..");
+					client.getOutput().writeUTF(msgForHighestBidder);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			} else { // for any other client, only inform them if they have joined the auction
 				if( client.getProtocol().isReceivingOptionFromMenu()  == false ) { 
 					try {
-						client.getOutput().writeUTF(
-													"Item " + soldItem.getName() + 
-													" has been sold to " + soldItem.getHighestBidder() + 
-													" for " + soldItem.getPrice() + 
-													" euro\n"
-													);
-
+						client.getOutput().writeUTF(msgForOthers);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -85,6 +79,8 @@ public class AuctionServer
 			}
 		}
 	}
+
+
 
 
 	//will return true if the client is already registered to the system
