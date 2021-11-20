@@ -7,21 +7,32 @@ import java.util.TimerTask;
 public class AuctionSystem {
     private static List<BidItem> bidItems = new ArrayList<>();
 	private static BidItem currentBidItem;
-	private static int bidPeriod = 60;
+	private static int defaultBidPeriod = 60;
 	static Timer timer;
 
     public AuctionSystem() { 
-        bidItems.add(new BidItem("Bicycle", 100f, 2));
-		// bidItems.add(new BidItem("Keyboard", 10f, 2));
-		// bidItems.add(new BidItem("Mouse", 7.5f, 2));
-		// bidItems.add(new BidItem("Monitor", 120f, 2));
-		// bidItems.add(new BidItem("HDMI cable", 5.5f, 2));
+        bidItems.add(new BidItem("Bicycle", 100f, 15));
+		bidItems.add(new BidItem("Keyboard", 10f, 15));
+		bidItems.add(new BidItem("Mouse", 7.5f, defaultBidPeriod));
+		bidItems.add(new BidItem("Monitor", 120f, defaultBidPeriod));
+		bidItems.add(new BidItem("HDMI cable", 5.5f, defaultBidPeriod));
 
         //start auctioning first item in the list
 		currentBidItem = bidItems.get(0);
 		
 		countDownBidPeriod();
     }
+
+
+
+	static void addBidItem(BidItem bidItem) { 
+		bidItems.add(bidItem);
+
+		if(currentBidItem == null) {
+			currentBidItem = bidItem;
+			countDownBidPeriod();
+		}
+	}
 
 
 	public static List<BidItem> getBidItems() {
@@ -66,7 +77,7 @@ public class AuctionSystem {
 						
 						currentBidItem.setSold(true);
 
-						
+						//send a message to clients that the item is sold
 						AuctionServerProtocol.sendSellMsg(currentBidItem);							
 						
                         //get the next item to sell

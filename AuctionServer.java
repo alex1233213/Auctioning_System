@@ -173,7 +173,8 @@ class AddBidItemThread extends Thread {
 					if(bidPeriod > 60) { 
 						System.out.println("Bid item could not be added. Max period must be 60 seconds\nEnter '+' to try again");
 					} else { 
-						AuctionSystem.getBidItems().add(new BidItem(name, price, bidPeriod)); 
+						AuctionSystem.addBidItem(new BidItem(name, price, bidPeriod));
+						// AuctionSystem.getBidItems().add(new BidItem(name, price, bidPeriod)); 
 						System.out.println("Successfully added item to auction system. Enter '+' to add another item");
 					}
 				} catch (Exception e) { 
